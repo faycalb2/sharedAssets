@@ -17,7 +17,7 @@ Progress:
     - admin can create users, teams & tags
     - admin can update teams & tags
     - admin can delete tags & teams (pivot record also deleted)
-    - move auth code to policies
+    - move auth code to policies (tried but changed my mind)
 
 To Do:
     - Write how to install
