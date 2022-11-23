@@ -3,28 +3,26 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Models\User;
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
+use App\Http\Controllers\BaseController;
 use App\Http\Requests\LoginLoginRequest;
 
-class LoginController extends Controller
+class LoginController extends BaseController
 {
     public function login(LoginLoginRequest $request)
     {
-        $request->validated($request->all());
+        $validated = $request->validated();
 
-        if(!auth()->attempt($request->only('email','password'))){
-            return response()->json([
-                'error' => 'The info you provided do not match our record.',
-            ]);
+        if(!auth()->attempt(['email' => $validated['email'], 'password' => $validated['password']])){
+            return $this->errorResponse('The info you provided do not match our record.');
         }
         
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('email', $validated['email'])->first();
 
-        return response()->json([
-            'success' => 'You are now logged in.',
-            'user' => $user,
-            'token' => $user->createToken('Token for: ' . $user->name)->plainTextToken
+        return $this->successResponse(
+            'You are now logged in.', [
+                'user' => new UserResource($user), 
+                'token' => $user->createToken('Token for: ' . $user->name)->plainTextToken
         ]);
     }
 }

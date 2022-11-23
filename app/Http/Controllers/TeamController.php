@@ -3,79 +3,69 @@
 namespace App\Http\Controllers;
 
 use App\Models\Team;
+use App\Models\User;
 use Illuminate\Http\Request;
+use App\Http\Resources\TeamResource;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StoreTeamRequest;
 
-class TeamController extends Controller
+class TeamController extends BaseController
 {
+    public function index()
+    {
+        $this->authorize('isAdmin', User::class);
+
+        $userId = Auth::user()->id;
+
+        return TeamResource::collection(
+            Team::
+                whereHas('users', function($q) use($userId) {
+                    $q->where('user_id', '=', $userId);  
+                })
+                ->get()
+        );
+    }
+
     public function store(StoreTeamRequest $request)
     {
         $user = Auth::user();
 
-        if ($user->role !== 0) {
-            return response()->json([
-                'error' => 'You are not authorized to perform this operation.',
-            ]);
-        }
+        $this->authorize('isAdmin', $user);
 
-        $request->validated($request->all());
+        $validated = $request->validated();
 
         $team = Team::create([
-            'name' => $request->name
+            'name' => $validated['name']
         ]);
 
         if (!$team) {
-            return response()->json([
-                'error' => 'There was an issue while creating the team, please try again later.',
-            ]);
+            return $this->errorResponse('There was an issue while creating the team, please try again later.');
         }
 
         $team->users()->attach($user->id);
 
-        return response()->json([
-            'success' => 'Team created successfully.',
-            'team' => $team,
-        ]);
+        return $this->successResponse('Team created successfully.', new TeamResource($team));
     }
 
     public function update(Request $request, Team $team)
     {
-        $user = Auth::user();
-        $userId = $user->id;
+        $this->authorize('isAdmin', User::class);
+        $this->authorize('canAccessTeam', [User::class, $team->id]);
 
-        $teams = Team::whereHas('users', function($q) use($userId) {
-            $q->where('user_id', '=', $userId);  
-        })->get();
+        $team->update($request->validated());
 
-        if ($teams->where('id', $team->id)->count() === 0 || $user->role !== 0) {
-            return response()->json([
-                'error' => 'You are not authorized to perform this operation.',
-            ]);
-        }
-
-        $team->update($request->all());
-
-        return response()->json([
-            'success' => 'team updated successfully.',
-            'team' => $team,
-        ]);
+        return $this->successResponse('Team updated successfully.', new TeamResource($team));
     }
 
     public function destroy(Team $team)
     {
-        $verified_team = $team->users()->where('user_id', Auth::user()->id)->first();
-        
-        if (!$verified_team) {
-            return response()->json([
-                'error' => 'You are not authorized to perform this action.',
-            ]);
-        }
+        $this->authorize('isAdmin', User::class);
+        $this->authorize('canAccessTeam', [User::class, $team->id]);
 
         $team->users(Auth::user()->id)->detach();
         $team->users(Auth::user()->id)->delete();
         $team->delete();
 
-        return response()->json('Team is deleted.');
+        return $this->successResponse('Team deleted successfully.');
     }
 }

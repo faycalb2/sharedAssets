@@ -3,69 +3,68 @@
 namespace App\Http\Controllers;
 
 use App\Models\Tag;
+use App\Models\User;
 use Illuminate\Http\Request;
+use App\Http\Resources\TagResource;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StoreTagRequest;
 
-class TagController extends Controller
+class TagController extends BaseController
 {
+    public function index()
+    {
+        $user = Auth::user();
+        $the_admin = $user->created_by;
+
+        if ($the_admin == null) {
+            $the_admin = $user->id;
+        }
+
+        return TagResource::collection(
+            Tag::
+                where('user_id', '=', $the_admin)
+                ->get()
+        );
+    }
+    
     public function store(StoreTagRequest $request)
     {
         $user = Auth::user();
-        
-        if ($user->role !== 0) {
-            return response()->json([
-                'error' => 'You are not authorized to create tags.',
-            ]);
-        }
 
-        $request->validated($request->all());
+        $this->authorize('isAdmin', User::class);
+
+        $validated = $request->validated();
 
         $tag = Tag::create([
-            'name' => $request->name,
+            'name' => $validated['name'],
             'user_id' => $user->id
         ]);
 
         if (!$tag) {
-            return response()->json([
-                'error' => 'There was an issue while creating the tag, please try again later.',
-            ]);
+            return $this->errorResponse('There was an issue while creating the tag, please try again later.');
         }
 
-        return response()->json([
-            'success' => 'Tag created successfully.',
-            'tag' => $tag,
-        ]);
+        return $this->successResponse('Tag created successfully.', new TagResource($tag));
     }
 
     public function update(Request $request, Tag $tag)
     {
-        $user = Auth::user();
+        $this->authorize('isAdmin', User::class);
+        $this->authorize('canAccessTag', [User::class, $tag]);
+        
+        $tag->update($request->validated());
 
-        if ($user->role !== 0 || $tag->user->id !== $user->id) {
-            return response()->json([
-                'error' => 'You are not authorized to perform this operation.',
-            ]);
-        }
-
-        $tag->update($request->all());
-
-        return response()->json([
-            'success' => 'Tag updated successfully.',
-            'tag' => $tag,
-        ]);
+        return $this->successResponse('Tag updated successfully.', new TagResource($tag));
     }
 
     public function destroy(Tag $tag)
     {
-        if (Auth::user()->id !== $tag->user_id) {
-            return response()->json([
-                'error' => 'You are not authorized to perform this action.',
-            ]);
-        }
+        $this->authorize('isAdmin', User::class);
+
+        $this->authorize('canAccessTag', [User::class, $tag]);
 
         $tag->delete();
 
-        return response()->json('Tag is deleted.');
+        return $this->successResponse('Tag deleted successfully.');
     }
 }

@@ -4,22 +4,23 @@ namespace App\Http\Controllers\Auth;
 
 use App\Models\Team;
 use App\Models\User;
-use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\StoreUserRequest;
+use App\Http\Controllers\BaseController;
 use App\Http\Requests\StoreAdminRequest;
 
-class RegisterController extends Controller
+class RegisterController extends BaseController
 {
     public function storeAdmin(StoreAdminRequest $request)
     {
-        $request->validated($request->all());
+        $validated = $request->validated();
 
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
         ]);
 
         if (!$user) {
@@ -28,10 +29,10 @@ class RegisterController extends Controller
             ]);
         }
 
-        return response()->json([
-            'success' => 'Thank you for registring.',
-            'user' => $user,
-            'token' => $user->createToken('Token for: ' . $user->name)->plainTextToken
+        return $this->successResponse(
+            'Thank you for registring.', [
+                'user' => new UserResource($user), 
+                'token' => $user->createToken('Token for: ' . $user->name)->plainTextToken
         ]);
     }
 
@@ -50,17 +51,18 @@ class RegisterController extends Controller
             ]);
         }
         
-        $request->validated($request->all());
-    
+        $validated = $request->validated();
+
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
             'role' => 1,
-            'team_id' => $request->team_id,
+            'created_by' => $userId,
+            'team_id' => $validated['team_id'],
         ]);
 
-        $user->teams()->attach($request->team_id);
+        $user->teams()->attach($validated['team_id']);
 
         if (!$user) {
             return response()->json([
@@ -68,9 +70,6 @@ class RegisterController extends Controller
             ]);
         }
 
-        return response()->json([
-            'success' => 'User created successfully.',
-            'user' => $user,
-        ]);
+        return $this->successResponse('User is added successfully.');
     }
 }

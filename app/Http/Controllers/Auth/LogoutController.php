@@ -10,6 +10,7 @@ class LogoutController extends Controller
     public function destroy()
     {
         Auth::user()->currentAccessToken()->delete();
-        return response()->json('You are logged out.');
+
+        return $this->successResponse('You are logged out.');
     }
 }
