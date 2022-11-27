@@ -22,8 +22,8 @@ class DatabaseSeeder extends Seeder
             ->hasAttached(
                 Team::factory()->count(3)
             )
+            ->hasTags(6)
             ->create();
-        \App\Models\Tag::factory(10)->create();
         \App\Models\Asset::factory(10)->create();
     }
 }
