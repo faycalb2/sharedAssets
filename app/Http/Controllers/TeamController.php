@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Team;
 use App\Models\User;
-use Illuminate\Http\Request;
 use App\Http\Resources\TeamResource;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StoreTeamRequest;
+use App\Http\Requests\UpdateTeamRequest;
 
 class TeamController extends BaseController
 {
@@ -47,7 +47,7 @@ class TeamController extends BaseController
         return $this->successResponse('Team created successfully.', new TeamResource($team));
     }
 
-    public function update(Request $request, Team $team)
+    public function update(UpdateTeamRequest $request, Team $team)
     {
         $this->authorize('isAdmin', User::class);
         $this->authorize('canAccessTeam', [User::class, $team->id]);

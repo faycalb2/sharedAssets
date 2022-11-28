@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Asset;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\AssetResource;
 use App\Http\Requests\StoreAssetRequest;
+use App\Http\Requests\UpdateAssetRequest;
 
 class AssetController extends BaseController
 {
@@ -50,7 +50,7 @@ class AssetController extends BaseController
         return $this->successResponse('Asset created successfully.', new AssetResource($asset));
     }
 
-    public function update(Request $request, Asset $asset)
+    public function update(UpdateAssetRequest $request, Asset $asset)
     {
         $this->authorize('isAdmin', User::class);
         $this->authorize('canAccessTeam', [User::class, $asset->team_id]);

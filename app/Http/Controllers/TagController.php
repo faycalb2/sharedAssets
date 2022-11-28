@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Http\Resources\TagResource;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StoreTagRequest;
+use App\Http\Requests\UpdateTeamRequest;
 
 class TagController extends BaseController
 {
@@ -47,7 +48,7 @@ class TagController extends BaseController
         return $this->successResponse('Tag created successfully.', new TagResource($tag));
     }
 
-    public function update(Request $request, Tag $tag)
+    public function update(UpdateTeamRequest $request, Tag $tag)
     {
         $this->authorize('isAdmin', User::class);
         $this->authorize('canAccessTag', [User::class, $tag]);
