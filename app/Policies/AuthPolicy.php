@@ -14,6 +14,7 @@ class AuthPolicy
 
     public function isAdmin(User $user)
     {
+        // Right now everyone is being default to admin
         return $user->role == 0;
     }
 
@@ -23,7 +24,7 @@ class AuthPolicy
 
         $teams = Team::
                     whereHas('users', function($q) use($userId) {
-                        $q->where('user_id', '=', $userId);  
+                        $q->where('user_id', '=', $userId);
                     })
                     ->get();
 

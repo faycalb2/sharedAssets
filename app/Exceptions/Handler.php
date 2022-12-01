@@ -3,6 +3,10 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\ViewErrorBag;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -44,7 +48,23 @@ class Handler extends ExceptionHandler
     public function register()
     {
         $this->reportable(function (Throwable $e) {
-            //
+
         });
+    }
+
+    protected function renderExceptionResponse($request, Throwable $e)
+    {
+        $errorCode = time() . mt_rand(0,10000);
+        $message = $e->getMessage();
+        Log::critical(sprintf('Error: %s and Code: %s', $message, $errorCode), [$e]);
+        return new JsonResponse([
+            'meta' => [
+                'type' => 'error'
+            ],
+            'data' => [
+                'message' => $message,
+                'error_code' => $errorCode
+            ]
+        ], 500);
     }
 }
