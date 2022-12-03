@@ -64,7 +64,7 @@ class AssetController extends BaseController
     {
         $this->authorize('isAdmin', User::class);
         $this->authorize('canAccessTeam', [User::class, $asset->team_id]);
-        
+
         $asset->delete();
 
         return $this->successResponse('Asset deleted successfully.');

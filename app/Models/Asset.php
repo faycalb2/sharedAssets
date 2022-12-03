@@ -31,6 +31,7 @@ class Asset extends Model
 
     public function scopeSearch($query)
     {
+        // This is great! Great use of scopes
         if (!empty(request('search'))) {
             $query
                 ->where('label', 'like', '%' . request('search') . '%')

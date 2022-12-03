@@ -17,12 +17,17 @@ class RegisterController extends BaseController
     {
         $validated = $request->validated();
 
+        // Demo exception handling
+        // Do you want the user to have a default role
+        throw new \Exception('Hello World');
+        /** @var User $user */
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
         ]);
 
+        // This is not needed
         if (!$user) {
             return response()->json([
                 'error' => 'There was an issue with registration, please try again later.',
@@ -31,26 +36,27 @@ class RegisterController extends BaseController
 
         return $this->successResponse(
             'Thank you for registring.', [
-                'user' => new UserResource($user), 
+                'user' => new UserResource($user),
+                // Lets change to user id and some client information
                 'token' => $user->createToken('Token for: ' . $user->name)->plainTextToken
         ]);
     }
 
     public function storeUser(StoreUserRequest $request)
     {
-        
+
         $userId = Auth::user()->id;
-        
+
         $teams = Team::whereHas('users', function($q) use($userId) {
-            $q->where('user_id', '=', $userId);  
+            $q->where('user_id', '=', $userId);
         })->get();
-        
+
         if ($teams->where('id', $request->team_id)->count() === 0) {
             return response()->json([
                 'error' => 'Error finding the team, please contact support.',
             ]);
         }
-        
+
         $validated = $request->validated();
 
         $user = User::create([
