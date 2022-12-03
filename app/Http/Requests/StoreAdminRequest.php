@@ -25,8 +25,8 @@ class StoreAdminRequest extends FormRequest
     {
         return [
             'name' => 'required | string | max:255',
-            'email' => 'required | string | email | max:255 | unique:users',
-            'password' => 'required | confirmed | min:6',
+            'email' => 'required | string | email | max:255 | unique:users,email',
+            'password' => 'required | min:6',
         ];
     }
 }

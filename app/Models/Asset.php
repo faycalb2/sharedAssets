@@ -12,7 +12,7 @@ class Asset extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['label', 'content', 'tag_id', 'team_id', 'user_id'];
+    protected $fillable = ['label', 'content', 'team_id', 'user_id'];
 
     public function user()
     {
@@ -26,7 +26,7 @@ class Asset extends Model
 
     public function tag()
     {
-        return $this->belongsTo(Tag::class);
+        return $this->morphOne(Tag::class, 'taggable');
     }
 
     public function scopeSearch($query)

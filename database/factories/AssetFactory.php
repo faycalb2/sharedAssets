@@ -32,7 +32,6 @@ class AssetFactory extends Factory
             'label' => $this->faker->sentence(),
             'content' => $this->faker->paragraph(),
             'user_id' => $user_id,
-            'tag_id' => $this->faker->numberBetween($tags[0], $tags[array_key_last($tags)]),
             'team_id' => $this->faker->numberBetween($teams[0], $teams[array_key_last($teams)]),
         ];
     }

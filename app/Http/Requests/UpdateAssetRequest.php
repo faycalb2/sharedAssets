@@ -24,8 +24,7 @@ class UpdateAssetRequest extends FormRequest
     public function rules()
     {
         return [
-            'label' => 'required | string | max:255',
-            'content' => 'required | string',
+            'label' => 'max:255',
         ];
     }
 }

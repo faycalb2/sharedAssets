@@ -26,7 +26,6 @@ class StoreAssetRequest extends FormRequest
         return [
             'label' => 'required | string | max:255',
             'content' => 'required | string',
-            'tag_id' => 'required | integer',
             'team_id' => 'required | integer',
         ];
     }

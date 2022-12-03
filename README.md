@@ -1,12 +1,15 @@
-## Progress:
-    (week 1)
+## What is this?
+    It's a service where you bla bla.... 
+    `screenshot here`
+
+## Summary of what's been done:
     - Models with migrations: User(already exist), Team, Asset, Tag
     - Relationships:
                     User                Team                Asset                Tag
-            User    -                   belongsToMany       hasMany              hasMany
+            User    -                   belongsToMany       hasMany              polymorphic
             Team    belongsToMany       -                   hasMany              -
-            Asset   belongsTo           belongsTo           -                    belongsTo
-            Tag     belongsTo           -                   hasMany              -
+            Asset   belongsTo           belongsTo           -                    polymorphic
+            Tag     polymorphic         -                   polymorphic          -
    
     - php artisan make:migration create_team_user_table
     - setup Sanctum
@@ -18,13 +21,21 @@
     - admin can create users, teams & tags
     - admin can update teams & tags
     - admin can delete tags & teams (pivot record also deleted)
-    
-    (week 2)
-    - move auth code to Auth policy
-    - move json success/error responses to a BaseController
+    - an Auth policy
+    - a BaseController for json success/error responses
     - resource/collection for all models
-    - change $request->validated($request->all()) to $validated = $request->validated()
+    - custom requests $request->validated()
     - 18 tests written
+    - Implement Swagger for API documentation
+
+## How To Install:
+    - Connect Database
+    - Run `php artisan migrate:fresh --seed`
+    - Swagger: http://127.0.0.1:8000/api/documentation
 
 ## To Do:
-    - Write how to install
+    - 
+
+## To Consider:
+    - Subscriptions
+

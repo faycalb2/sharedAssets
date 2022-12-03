@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\User;
-use App\Models\Asset;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -11,15 +9,10 @@ class Tag extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'user_id'];
+    protected $fillable = ['name', 'taggable_id', 'taggable_type'];
 
-    public function user()
+    public function taggable()
     {
-        return $this->belongsTo(User::class);
-    }
-
-    public function asset()
-    {
-        return $this->hasMany(Asset::class);
+        return $this->morphTo();
     }
 }

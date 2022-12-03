@@ -17,7 +17,6 @@ return new class extends Migration
             $table->id();
             $table->string('label');
             $table->text('content');
-            $table->foreignId('tag_id')->constrained();
             $table->foreignId('team_id')->constrained();
             $table->foreignId('user_id')->constrained();
             $table->timestamps();

@@ -54,7 +54,7 @@ class User extends Authenticatable
 
     public function tags()
     {
-        return $this->hasMany(Tag::class);
+        return $this->morphMany(Tag::class, 'taggable');
     }
 
     public function teams()

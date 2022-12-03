@@ -18,12 +18,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        \App\Models\User::factory(10)
-            ->hasAttached(
-                Team::factory()->count(3)
-            )
-            ->hasTags(6)
-            ->create();
-        \App\Models\Asset::factory(10)->create();
+        Tag::factory()->count(5)->for(
+            User::factory(7), 'taggable')
+            ->hasAttached(Team::factory()->count(4))
+        ->create();
+
+        Asset::factory(10)->create();
     }
 }

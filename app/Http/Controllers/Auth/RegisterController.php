@@ -13,6 +13,75 @@ use App\Http\Requests\StoreAdminRequest;
 
 class RegisterController extends BaseController
 {
+    /**
+     * Create admin
+     * @OA\Post (
+     *     path="/api/register",
+     *     tags={"Register"},
+     *     @OA\RequestBody(
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 @OA\Property(
+     *                      type="object",
+     *                      @OA\Property(
+     *                          property="email",
+     *                          type="string"
+     *                      ),
+     *                      @OA\Property(
+     *                          property="name",
+     *                          type="string"
+     *                      ),
+     *                      @OA\Property(
+     *                          property="password",
+     *                          type="string"
+     *                      ),
+     *                      @OA\Property(
+     *                          property="password_confirmation",
+     *                          type="string"
+     *                      ),
+     *                      @OA\Property(
+     *                          property="role",
+     *                          type="integer"
+     *                      )
+     *                 ),
+     *                 example={
+     *                     "email":"example@email.com",
+     *                     "name":"John Doe",
+     *                     "password": "123456",
+     *                     "password_confirmation": "123456",
+     *                     "role": 0
+     *                }
+     *             )
+     *         )
+     *      ),
+     *      @OA\Response(
+     *          response=201,
+     *          description="Success",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="id", type="number", example=1),
+     *              @OA\Property(property="email", type="string", example="email"),
+     *              @OA\Property(property="name", type="string", example="name"),
+     *              @OA\Property(property="password", type="string", example="password"),
+     *              @OA\Property(property="role", type="string", example=0),
+     *              @OA\Property(property="updated_at", type="string", example="2022-10-11T09:25:53.000000Z"),
+     *              @OA\Property(property="created_at", type="string", example="2022-10-11T09:25:53.000000Z"),
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Bad Request"
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden"
+     *      )
+     * )
+     */
     public function storeAdmin(StoreAdminRequest $request)
     {
         $validated = $request->validated();
@@ -23,12 +92,6 @@ class RegisterController extends BaseController
             'password' => Hash::make($validated['password']),
         ]);
 
-        if (!$user) {
-            return response()->json([
-                'error' => 'There was an issue with registration, please try again later.',
-            ]);
-        }
-
         return $this->successResponse(
             'Thank you for registring.', [
                 'user' => new UserResource($user), 
@@ -36,29 +99,78 @@ class RegisterController extends BaseController
         ]);
     }
 
+    /**
+     * Admin creates a user
+     * @OA\Post (
+     *     path="/api/user/register",
+     *     tags={"Register"},
+     *     @OA\RequestBody(
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 @OA\Property(
+     *                      type="object",
+     *                      @OA\Property(
+     *                          property="email",
+     *                          type="string"
+     *                      ),
+     *                      @OA\Property(
+     *                          property="name",
+     *                          type="string"
+     *                      ),
+     *                      @OA\Property(
+     *                          property="password",
+     *                          type="string"
+     *                      ),
+     *                      @OA\Property(
+     *                          property="team_id",
+     *                          type="integer"
+     *                      )
+     *                 ),
+     *                 example={
+     *                     "email":"example@email.com",
+     *                     "name":"John Doe",
+     *                     "password": "123456",
+     *                     "team_id": 1
+     *                }
+     *             )
+     *         )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="success",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="id", type="number", example=1),
+     *              @OA\Property(property="email", type="string", example="email"),
+     *              @OA\Property(property="name", type="string", example="name"),
+     *              @OA\Property(property="password", type="string", example="password"),
+     *              @OA\Property(property="role", type="string", example=1),
+     *              @OA\Property(property="updated_at", type="string", example="2022-10-11T09:25:53.000000Z"),
+     *              @OA\Property(property="created_at", type="string", example="2022-10-11T09:25:53.000000Z"),
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="invalid",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="msg", type="string", example="fail"),
+     *          )
+     *      )
+     * )
+     */
     public function storeUser(StoreUserRequest $request)
     {
-        
-        $userId = Auth::user()->id;
-        
-        $teams = Team::whereHas('users', function($q) use($userId) {
-            $q->where('user_id', '=', $userId);  
-        })->get();
-        
-        if ($teams->where('id', $request->team_id)->count() === 0) {
-            return response()->json([
-                'error' => 'Error finding the team, please contact support.',
-            ]);
-        }
-        
         $validated = $request->validated();
+
+        $this->authorize('isAdmin', User::class);
+        $this->authorize('canAccessTeam', [User::class, $validated['team_id']]);
 
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'role' => 1,
-            'created_by' => $userId,
+            'created_by' => Auth::user()->id,
             'team_id' => $validated['team_id'],
         ]);
 

@@ -5,7 +5,6 @@ namespace App\Policies;
 use App\Models\Tag;
 use App\Models\Team;
 use App\Models\User;
-use App\Models\Asset;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class AuthPolicy
@@ -36,9 +35,9 @@ class AuthPolicy
 
     public function canAccessTag(User $user, Tag $tag)
     {
-        $userId = $user->id;
+        $owner = $tag->taggable()->user()->first();
 
-        if ($tag->user_id !== $userId) {
+        if ($owner->id !== $user->id) {
             return false;
         }
 
