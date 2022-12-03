@@ -1,6 +1,6 @@
 ## What is this?
-    It's a service where you bla bla.... 
-    `screenshot here`
+    It's a service where your team share their knowledge like saved replies, links, examples, and any type od info.. simply search for something, and the results will show up.
+    `screenshot`
 
 ## Summary of what's been done:
     - Models with migrations: User(already exist), Team, Asset, Tag
@@ -32,9 +32,6 @@
     - Connect Database
     - Run `php artisan migrate:fresh --seed`
     - Swagger: http://127.0.0.1:8000/api/documentation
-
-## To Do:
-    - 
 
 ## To Consider:
     - Subscriptions
