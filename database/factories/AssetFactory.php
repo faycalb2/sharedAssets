@@ -21,7 +21,7 @@ class AssetFactory extends Factory
     {
         $user_id = User::all()->random()->id;
 
-        $tags = Tag::where('user_id', '=', $user_id)->pluck('id')->toArray();
+        Tag::where('user_id', '=', $user_id)->pluck('id')->toArray();
         
         $teams = Team::
                     whereHas('users', function($q) use($user_id) {

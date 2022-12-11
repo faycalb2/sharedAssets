@@ -35,7 +35,7 @@ class AuthPolicy
 
     public function canAccessTag(User $user, Tag $tag)
     {
-        $owner = $tag->taggable()->user()->first();
+        $owner = $tag->user()->first();
 
         if ($owner->id !== $user->id) {
             return false;

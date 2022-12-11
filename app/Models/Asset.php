@@ -24,9 +24,9 @@ class Asset extends Model
         return $this->belongsTo(Team::class);
     }
 
-    public function tag()
+    public function tags()
     {
-        return $this->morphOne(Tag::class, 'taggable');
+        return $this->morphToMany(Tag::class, 'taggable');
     }
 
     public function scopeSearch($query)

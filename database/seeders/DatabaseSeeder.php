@@ -18,11 +18,19 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        Tag::factory()->count(5)->for(
-            User::factory(7), 'taggable')
-            ->hasAttached(Team::factory()->count(4))
-        ->create();
+        // Tag::factory()->count(5)->for(
+        //     User::factory(7), 'taggable')
+        //     ->hasAttached(Team::factory()->count(4))
+        // ->create();
 
-        Asset::factory(10)->create();
+        User::factory(7)
+            ->hasAttached(Team::factory(2))
+            ->create();
+
+        // Tag::factory(7)
+        //     ->hasAssets(3)
+        //     ->create();
+        
+        // Asset::factory(10)->create();
     }
 }

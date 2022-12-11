@@ -77,11 +77,11 @@ class TagController extends BaseController
         $this->authorize('isAdmin', User::class);
 
         $validated = $request->validated();
-      
-        $tag = Tag::create([
-            'name'           => $validated['name'],
-            'taggable_id'    => Auth::user()->id,
-            'taggable_type'  => 'App\Models\User',
+
+        $user = Auth::user();
+
+        $tag = $user->tags()->create([
+            'name' => $validated['name'],
         ]);
 
         if (!$tag) {
@@ -187,9 +187,12 @@ class TagController extends BaseController
      */
     public function destroy(Tag $tag)
     {
-        $this->authorize('isAdmin', User::class);
+        $user = Auth::user();
 
+        $this->authorize('isAdmin', User::class);
         $this->authorize('canAccessTag', [User::class, $tag]);
+
+        $tag->user($user)->detach();
 
         $tag->delete();
 

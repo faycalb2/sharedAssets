@@ -30,9 +30,8 @@ class AssetTest extends TestCase
     {
         $admin = User::first();
 
-        $tag = Tag::create([
+        $tag = $admin->tags()->create([
             'name' => 'TagName',
-            'user_id' => $admin->id
         ]);
 
         $team = Team::create([
@@ -46,7 +45,6 @@ class AssetTest extends TestCase
             [
                 'label' => 'My new task!',
                 'content' => 'Something',
-                'tag_id' => $tag->id,
                 'user_id' => $admin->id,
                 'team_id' => $team->id,
             ]
@@ -69,7 +67,6 @@ class AssetTest extends TestCase
             [
                 'label' => 'My updated task!',
                 'content' => 'Something',
-                'tag_id' => $asset->tag_id,
                 'team_id' => $asset->team_id,
             ]
         );
